@@ -4,7 +4,6 @@
 #   - IRS SOI state-to-state migration, every year from 2011-12 on
 #   - IRS SOI county-to-county migration, 2020-21 on
 #   - Census County Business Patterns, the newest year, 2-digit sectors only
-#   - BLS QCEW, the newest published quarter, all-industry totals per area
 set -u
 out=${1:-raw}
 mkdir -p "$out" && cd "$out"
@@ -30,17 +29,6 @@ for ((y = now; y >= now - 4; y--)); do
     rm cbp${yy}co.txt
     break
   fi
-done
-
-# BLS asks scripts to identify themselves with a contact address
-bls_ua="currency-flow-map data update (jcashen505@gmail.com)"
-y=$(date -u +%Y)
-for yq in "$y 4" "$y 3" "$y 2" "$y 1" "$((y - 1)) 4" "$((y - 1)) 3" "$((y - 1)) 2" "$((y - 1)) 1"; do
-  set -- $yq
-  if curl -fsSL --retry 2 -A "$bls_ua" -o qcew.csv "https://data.bls.gov/cew/data/api/$1/$2/industry/10.csv" && [ "$(wc -l < qcew.csv)" -gt 1000 ]; then
-    mv qcew.csv "qcew$1q$2.csv"; echo "ok qcew$1q$2"; break
-  fi
-  rm -f qcew.csv; echo "missing qcew $1 q$2"
 done
 
 gzip -9f *.csv
