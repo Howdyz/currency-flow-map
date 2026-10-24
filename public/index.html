@@ -62,6 +62,11 @@ button,select{font:600 14px var(--body);color:var(--ink)}
 @keyframes run{to{stroke-dashoffset:-13}}
 @media (prefers-reduced-motion:reduce){.arc.run{animation:none;stroke-dasharray:none;opacity:.6}}
 .dot{fill:var(--ink);stroke:var(--ground);stroke-width:1;vector-effect:non-scaling-stroke;pointer-events:none}
+.cty{stroke:none;pointer-events:none;vector-effect:non-scaling-stroke}
+.cty.live,.cmode .cty{pointer-events:all;cursor:pointer}
+.cty.live:hover,.cmode .cty:hover{stroke:var(--ink);stroke-width:1}
+.cty.on{stroke:var(--ink);stroke-width:2}
+.cmode .state{fill-opacity:1}
 
 .panel{position:absolute;top:12px;left:max(12px,env(safe-area-inset-left,0px));bottom:12px;width:300px;max-width:calc(100% - 24px);background:var(--panel);border:1px solid #ffffff14;border-radius:10px;box-shadow:0 10px 30px #0008;display:flex;flex-direction:column;z-index:4}
 .panel header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #ffffff12;font:700 15px var(--display)}
@@ -80,6 +85,7 @@ select{width:100%;background:var(--panel-2);border:1px solid #ffffff22;border-ra
 .range{display:flex;align-items:center;gap:10px}
 .range input{flex:1;accent-color:var(--chrome-hi)}
 .range output{font:600 13px var(--mono);min-width:2ch;text-align:right}
+#play{padding:4px 10px;min-width:38px}
 details{background:var(--panel-2);border-radius:6px;padding:8px 10px}
 details summary{cursor:pointer;font-weight:600}
 details p{margin:8px 0 0;color:var(--muted);font-size:14px}
@@ -102,7 +108,25 @@ details p b{color:var(--ink)}
 .row .m{font:600 13px var(--mono);font-variant-numeric:tabular-nums}
 .row .p{font:400 12px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums;min-width:7ch;text-align:right}
 .hint{margin-top:12px;font-size:13px;color:var(--muted)}
+.crumbs{font-size:13px;color:var(--muted);margin-bottom:4px}
+.crumbs button{all:unset;cursor:pointer;color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.crumbs button:hover{color:var(--ink)}
+.crumbs button:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+.fact{margin-top:12px;background:var(--panel-2);border-radius:6px;padding:8px 10px}
+.fact h3{margin:0 0 4px;font:700 12px var(--body);letter-spacing:.08em;text-transform:uppercase}
+.fact h3 small{font-weight:400;letter-spacing:.02em;text-transform:none;color:var(--muted)}
+.fact p{margin:0;font-size:14px}
+.bars{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:12px}
+.bars li{display:grid;grid-template-columns:minmax(0,11em) 1fr 3ch;gap:8px;align-items:center}
+.bars span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.bars i{height:8px;border-radius:0 4px 4px 0;display:block}
+.bars em{font:400 12px var(--mono);font-style:normal;text-align:right;color:var(--muted)}
+.cats{display:flex;flex-direction:column;gap:4px}
+.cats span{display:flex;align-items:center;gap:8px}
+.cats i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.cats em{font:400 11px var(--mono);font-style:normal;color:var(--muted)}
 
+.panel:not([hidden])~.legend{left:calc(max(12px,env(safe-area-inset-left,0px)) + 312px)}
 .legend{position:absolute;left:max(12px,env(safe-area-inset-left,0px));bottom:12px;background:#1d1916e6;border:1px solid #ffffff14;border-radius:8px;padding:8px 12px;font-size:12px;display:flex;flex-direction:column;gap:6px;z-index:2;pointer-events:none}
 .ramp{width:220px;max-width:60vw;height:10px;border-radius:3px}
 .ticks{display:flex;justify-content:space-between;font:400 11px var(--mono);color:var(--muted)}
@@ -136,6 +160,7 @@ th[aria-sort="ascending"] button::after{content:" ▴"}
 th:first-child,td:first-child,th.t,td.t{text-align:left}
 td{padding:6px 10px;border-bottom:1px solid #ffffff0d;text-align:right;font:400 13px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
 td.t{font:600 14px var(--body)}
+td.t.s{font-weight:400;color:var(--muted)}
 td.t button{all:unset;cursor:pointer}
 td.t button:hover{text-decoration:underline}
 td.t button:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
@@ -146,6 +171,7 @@ tr.on td{background:#7a3b2e40}
   .panel{top:auto;bottom:0;left:0;right:0;width:auto;max-width:none;max-height:62%;border-radius:12px 12px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
   .card{top:auto;bottom:0;left:0;right:0;width:auto;max-width:none;max-height:55%;border-radius:12px 12px 0 0;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
   .legend{bottom:auto;top:10px}
+  .panel:not([hidden])~.legend{left:max(12px,env(safe-area-inset-left,0px))}
   .src{display:none}
   .brand small{display:none}
   .brand{font-size:16px}
@@ -161,7 +187,7 @@ tr.on td{background:#7a3b2e40}
 
 <div class="app">
   <div class="bar">
-    <div class="brand">Currency Flow Map<small>Where America's money moved · IRS 2022–23</small></div>
+    <div class="brand">Currency Flow Map<small id="sub">Where America's money moved · IRS 2022–23</small></div>
     <div class="sp"></div>
     <button class="btn hide-sm" id="flick" aria-pressed="false" title="Space bar">Heat: on</button>
     <button class="btn" id="share" title="Copy a link to this exact view">Share</button>
@@ -189,7 +215,13 @@ tr.on td{background:#7a3b2e40}
             <label><input type="radio" name="style" id="st-out" value="out"><div><b>Money out</b><span>Total income that left with departing residents.</span></div></label>
             <label><input type="radio" name="style" id="st-pc" value="pc"><div><b>Net per household</b><span>Gain or loss per tax household that stayed put. Evens out big and small states.</span></div></label>
             <label><input type="radio" name="style" id="st-gap" value="gap"><div><b>Who's moving</b><span>Are newcomers richer (hot) or poorer (cold) than the people leaving? Average income per person.</span></div></label>
+            <label><input type="radio" name="style" id="st-ind" value="ind"><div><b>#1 industry</b><span>Each county colored by the industry with the most private-sector jobs.</span></div></label>
+            <label><input type="radio" name="style" id="st-jobs" value="jobs"><div><b>Job growth</b><span>Each county's change in jobs over the last year, from the latest BLS quarter.</span></div></label>
           </div>
+        </div>
+        <div class="group">
+          <label class="lbl" for="year">Year of moves</label>
+          <div class="range"><button class="btn" id="play" aria-label="Play through the years">▶</button><input type="range" id="year" min="0" max="0" step="1" value="0"><output id="yearv"></output></div>
         </div>
         <div class="group">
           <span class="lbl">Layers</span>
@@ -205,11 +237,12 @@ tr.on td{background:#7a3b2e40}
         <div class="group">
           <span class="lbl">Reading the map</span>
           <details><summary>What is being measured?</summary>
-            <p>Every year the IRS matches tax returns to see who changed states. Each arrow is the <b>adjusted gross income</b> of the households that moved along that route between the 2022 and 2023 filing years. It's money that follows people: paychecks, business income and retirement income that now gets earned and spent somewhere else.</p></details>
+            <p>Every year the IRS matches tax returns to see who changed states and counties. Each arrow is the <b>adjusted gross income</b> of the households that moved along that route between one filing year and the next. It's money that follows people: paychecks, business income and retirement income that now gets earned and spent somewhere else. The year slider covers 2011–12 through 2022–23, the latest the IRS has published.</p>
+            <p><b>#1 industry</b> is the sector with the most private-sector jobs in each county, from the Census Bureau's County Business Patterns.</p></details>
           <details><summary>How to use it</summary>
-            <p>Click any state to see where its money went and where its newcomers came from. Orange arrows leave the state, green arrows arrive. Click a state in the list to jump to it. Drag to pan, scroll or pinch to zoom, and press <b>space</b> to blink the heat layer off and on. <b>Table</b> ranks every state and route, and <b>Share</b> copies a link that reopens exactly what you're looking at.</p></details>
+            <p>Click any state to see where its money went and where its newcomers came from, then click one of its counties for that county's own routes and top industry. Orange arrows leave, green arrows arrive. Drag to pan, scroll or pinch to zoom, press <b>space</b> to blink the heat layer, and press ▶ to play through the years. <b>Table</b> ranks every state, route and county, and <b>Share</b> copies a link that reopens exactly what you're looking at.</p></details>
           <details><summary>What it leaves out</summary>
-            <p>Only households that filed taxes both years are counted, so it misses people who don't file and money that moves without anyone moving (online sales, investments, federal spending). For each state the map keeps its six biggest routes in and out, which covers most of the dollars.</p></details>
+            <p>Only households that filed taxes both years are counted, so it misses people who don't file and money that moves without anyone moving (online sales, investments, federal spending). For each state the map keeps its six biggest routes in and out, and for each county its eight biggest; the IRS doesn't list county routes with fewer than 20 households. Industry counts leave out government and most farm jobs. Connecticut has reported by planning region since 2022, which the county shapes here predate.</p></details>
         </div>
       </div>
     </aside>
@@ -221,6 +254,7 @@ tr.on td{background:#7a3b2e40}
         <div class="tabs" role="tablist">
           <button role="tab" id="tab-states" aria-selected="true">States</button>
           <button role="tab" id="tab-routes" aria-selected="false">Routes</button>
+          <button role="tab" id="tab-counties" aria-selected="false" hidden>Counties</button>
         </div>
         <input type="search" id="tfilter" placeholder="Filter by state" aria-label="Filter by state">
         <button class="x" id="closeT" aria-label="Close table">✕</button>
@@ -230,7 +264,7 @@ tr.on td{background:#7a3b2e40}
     </section>
 
     <div class="legend" id="legend"></div>
-    <div class="src">Data: <a href="https://www.irs.gov/statistics/soi-tax-stats-migration-data-2022-2023" target="_blank" rel="noopener">IRS SOI migration data, 2022–2023</a></div>
+    <div class="src">Data: <a href="https://www.irs.gov/statistics/soi-tax-stats-migration-data" target="_blank" rel="noopener">IRS SOI migration</a> · <a href="https://www.census.gov/programs-surveys/cbp.html" target="_blank" rel="noopener">Census County Business Patterns</a></div>
   </div>
 </div>
 
@@ -240,135 +274,253 @@ tr.on td{background:#7a3b2e40}
 const NAMES = {1:["AL","Alabama"],2:["AK","Alaska"],4:["AZ","Arizona"],5:["AR","Arkansas"],6:["CA","California"],8:["CO","Colorado"],9:["CT","Connecticut"],10:["DE","Delaware"],11:["DC","District of Columbia"],12:["FL","Florida"],13:["GA","Georgia"],15:["HI","Hawaii"],16:["ID","Idaho"],17:["IL","Illinois"],18:["IN","Indiana"],19:["IA","Iowa"],20:["KS","Kansas"],21:["KY","Kentucky"],22:["LA","Louisiana"],23:["ME","Maine"],24:["MD","Maryland"],25:["MA","Massachusetts"],26:["MI","Michigan"],27:["MN","Minnesota"],28:["MS","Mississippi"],29:["MO","Missouri"],30:["MT","Montana"],31:["NE","Nebraska"],32:["NV","Nevada"],33:["NH","New Hampshire"],34:["NJ","New Jersey"],35:["NM","New Mexico"],36:["NY","New York"],37:["NC","North Carolina"],38:["ND","North Dakota"],39:["OH","Ohio"],40:["OK","Oklahoma"],41:["OR","Oregon"],42:["PA","Pennsylvania"],44:["RI","Rhode Island"],45:["SC","South Carolina"],46:["SD","South Dakota"],47:["TN","Tennessee"],48:["TX","Texas"],49:["UT","Utah"],50:["VT","Vermont"],51:["VA","Virginia"],53:["WA","Washington"],54:["WV","West Virginia"],55:["WI","Wisconsin"],56:["WY","Wyoming"]};
 
 const CODE = Object.fromEntries(Object.entries(NAMES).map(([f,n])=>[n[0],+f]));
-const STYLES = ["net","in","out","pc","gap"];
+const STYLES = ["net","in","out","pc","gap","ind","jobs"];
+const COUNTY_STYLES = new Set(["ind","jobs"]);
+// Connecticut reports by planning region (2022 on), which the county shapes predate: approximate centers
+const CT_REGIONS = {9110:[-72.68,41.79],9120:[-73.24,41.22],9130:[-72.45,41.42],9140:[-73.07,41.55],9150:[-71.95,41.85],9160:[-73.22,41.86],9170:[-72.9,41.36],9180:[-72.1,41.45],9190:[-73.45,41.27]};
+// #1 industry map: three validated hues, everything else folds into Other
+const IND_COLORS = {62:"#3987e5",31:"#d95926",44:"#199e70"}, IND_OTHER = "#6b625b";
 
-// one year of IRS state-to-state data. in/out are $M of adjusted gross income, pin/pout are people,
-// pc is net per tax household that did not move, ain/aout are income per person arriving/leaving
+// IRS state-to-state data, one entry per year ("2223" = 2022→2023 filings). in/out are $M of adjusted gross
+// income, pin/pout are people, pc is net per tax household that did not move, ain/aout are income per person
+let YEARS = [], CYEARS = [], year = null;
+const ALLT = {}, ALLF = {};
 let T = {}, FLOWS = [];
-function setData(mig){
-  const stay=mig.stay; T={};
-  mig.tot.forEach(([f,i,o,pi,po])=>T[f]={in:i,out:o,net:i-o,pin:pi,pout:po,pc:(i-o)*1e6/(stay[f]||1),ain:i*1e6/pi,aout:o*1e6/po,gap:i*1e6/pi-o*1e6/po});
-  FLOWS=mig.flows.map(([o,d,p,m])=>({o,d,p,m}));
+function parseYear(mig){
+  const stay=mig.stay, t={};
+  mig.tot.forEach(([f,i,o,pi,po])=>t[f]={in:i,out:o,net:i-o,pin:pi,pout:po,pc:(i-o)*1e6/(stay[f]||1),ain:i*1e6/pi,aout:o*1e6/po,gap:i*1e6/pi-o*1e6/po});
+  return [t, mig.flows.map(([o,d,p,m])=>({o,d,p,m}))];
 }
+function setYear(y){year=y;T=ALLT[y];FLOWS=ALLF[y]}
+let IND = null, JOBS = null;   // county #1 industries (Census CBP) and latest jobs (BLS QCEW)
 
 const $ = s=>document.querySelector(s);
 const css = n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const money = m=>{const a=Math.abs(m);const s=m<0?"−":"";return a>=1000?s+"$"+(a/1000).toFixed(a>=10000?1:2)+"B":s+"$"+Math.round(a)+"M"};
+const money = m=>{const a=Math.abs(m);const s=m<0?"−":"";return a>=1000?s+"$"+(a/1000).toFixed(a>=10000?1:2)+"B":a>=10?s+"$"+Math.round(a)+"M":s+"$"+a.toFixed(1)+"M"};
 const signed = m=>(m>0?"+":"")+money(m);
 const ppl = n=>n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?Math.round(n/1e3)+"k":String(n);
 const usd = v=>"$"+Math.round(v/1000)+"k";
 const gapFmt = v=>(v>=0?"+":"−")+usd(Math.abs(v));
 const perHH = v=>(v>0?"+$":"−$")+Math.abs(Math.round(v)).toLocaleString();
+const pct = v=>(v>0?"+":v<0?"−":"")+Math.abs(v).toFixed(1)+"%";
+const yLong = y=>`20${y.slice(0,2)}→20${y.slice(2)}`;
+const yShort = y=>`20${y.slice(0,2)}–${y.slice(2)}`;
 
 const svg = d3.select("#map");
 const W=975,H=610;
 svg.attr("viewBox",`-10 0 ${W} ${H}`).attr("preserveAspectRatio","xMidYMid meet");
 const root = svg.append("g");
 const path = d3.geoPath();
+const albers = d3.geoAlbersUsa().scale(1300).translate([487.5,305]);   // the projection us-topo.json was made with
 const gStates = root.append("g");
+const gCounties = root.append("g");
 const gCty = root.append("path").attr("class","county");
 const gArcs = root.append("g");
 const gDots = root.append("g");
-let sel, C = {};
+let sel, csel, C = {}, CC = {}, CNAME = {};
 
+function centroid(g){
+  let best=g;
+  if(g.type==="MultiPolygon"){let ba=-1;g.coordinates.forEach(c=>{const p={type:"Polygon",coordinates:c};const a=path.area(p);if(a>ba){ba=a;best=p}})}
+  return path.centroid(best);
+}
 function build(topo){
   const states = topojson.feature(topo, topo.objects.states).features;
+  const counties = topojson.feature(topo, topo.objects.counties).features;
   gCty.datum(topojson.mesh(topo, topo.objects.counties, (a,b)=>a!==b && (a.id/1000|0)===(b.id/1000|0))).attr("d",path);
   // anchor point per state: centroid of its biggest piece, so Michigan's dot sits on land
-  states.forEach(f=>{
-    let g=f.geometry, best=g;
-    if(g.type==="MultiPolygon"){let ba=-1;g.coordinates.forEach(c=>{const p={type:"Polygon",coordinates:c};const a=path.area(p);if(a>ba){ba=a;best=p}})}
-    C[+f.id]=path.centroid(best);
-  });
+  states.forEach(f=>C[+f.id]=centroid(f.geometry));
   C[12]=[C[12][0]+14,C[12][1]+8]; // Florida: pull toward the peninsula
   C[22]=[C[22][0]-6,C[22][1]];
+  counties.forEach(f=>{CC[+f.id]=centroid(f.geometry);CNAME[+f.id]=f.properties.name});
+  Object.entries(CT_REGIONS).forEach(([c,ll])=>CC[c]=albers(ll));
   sel = gStates.selectAll("path").data(states).join("path")
     .attr("class","state").attr("d",path)
     .on("mousemove",(e,f)=>showTip(e,+f.id)).on("mouseleave",()=>$("#tip").hidden=true)
     .on("click",(e,f)=>{e.stopPropagation();choose(+f.id)});
+  csel = gCounties.selectAll("path").data(counties).join("path")
+    .attr("class","cty").attr("d",path)
+    .on("mousemove",(e,f)=>countyTip(e,+f.id)).on("mouseleave",()=>$("#tip").hidden=true)
+    .on("click",(e,f)=>{e.stopPropagation();const c=+f.id;(c/1000|0)===picked?chooseCounty(c):choose(c/1000|0)});
 }
 svg.on("click",()=>choose(null));
 
-const zoom = d3.zoom().scaleExtent([1,8]).on("zoom",e=>root.attr("transform",e.transform));
+// dots keep their on-screen size at any zoom; arcs and outlines already do (non-scaling strokes)
+let zk = 1;
+const zoom = d3.zoom().scaleExtent([1,12]).on("zoom",e=>{root.attr("transform",e.transform);zk=e.transform.k;gDots.selectAll("circle").attr("r",function(){return this.r0/zk})});
 svg.call(zoom).on("dblclick.zoom",null);
+const still = matchMedia("(prefers-reduced-motion: reduce)");
+let autoZoomed = false;
+function zoomTo(t){(still.matches?svg:svg.transition().duration(750)).call(zoom.transform,t)}
+// zoom so the points fill the part of the map that the panels, card and legend leave visible
+function fitPoints(pts){
+  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
+  const [x0,x1,y0,y1]=[d3.min(xs),d3.max(xs),d3.min(ys),d3.max(ys)];
+  const box=svg.node().getBoundingClientRect(),s=Math.min(box.width/W,box.height/H);
+  const ox=box.left+(box.width-W*s)/2,oy=box.top+(box.height-H*s)/2;
+  let L=box.left,R=box.right,T=box.top,B=box.bottom;
+  const over=el=>!el.hidden&&el.getBoundingClientRect();
+  const panel=over($("#panel")),card=over($("#card")),legend=$("#legend").getBoundingClientRect();
+  if(innerWidth>760){if(panel)L=panel.right;if(card)R=card.left}
+  else{if(card)B=card.top;T=Math.max(T,legend.bottom)}
+  // free area in map units
+  const fx0=(L-ox)/s-10,fx1=(R-ox)/s-10,fy0=(T-oy)/s,fy1=(B-oy)/s;
+  const k=Math.max(1,Math.min(12,.85*Math.min((fx1-fx0)/Math.max(x1-x0,1),(fy1-fy0)/Math.max(y1-y0,1))));
+  zoomTo(d3.zoomIdentity.translate((fx0+fx1)/2,(fy0+fy1)/2).scale(k).translate(-(x0+x1)/2,-(y0+y1)/2));
+  autoZoomed=true;
+}
+function unzoom(){if(autoZoomed){zoomTo(d3.zoomIdentity);autoZoomed=false}}
 
-let style="net", heat=true, showFlows=true, showCty=true, picked=null, topN=40;
+let style="net", heat=true, showFlows=true, showCty=true, picked=null, topN=40, cty=null;
+
+// county files: one per state per year, loaded on demand
+const CFILES = {};
+let CD = null;   // the selected state's county data for the selected year
+function loadCounties(y,s){
+  const k=y+"/"+String(s).padStart(2,"0");
+  if(!CFILES[k]) CFILES[k]=d3.json(`data/counties/${k}.json`).then(d=>({
+    rec:Object.fromEntries(d.c.map(([c,i,o,pi,po,st])=>[c,{c,in:i/1000,out:o/1000,net:(i-o)/1000,pin:pi,pout:po,pc:(i-o)*1000/(st||1),ain:pi?i*1000/pi:0,aout:po?o*1000/po:0}])),
+    routes:d.r.map(([o,d,p,a])=>({o,d,p,m:a/1000})),
+    names:d.n
+  })).catch(()=>null);
+  return CFILES[k];
+}
+function syncCounties(){
+  if(!picked||!CYEARS.includes(year)){CD=null;return Promise.resolve()}
+  const want=year+"/"+picked;
+  return loadCounties(year,picked).then(d=>{if(want===year+"/"+picked)CD=d});
+}
+// a county's own biggest routes out and in (the file also has other counties' routes that touch it)
+function countyRoutes(c){
+  if(!CD)return [];
+  const top=k=>CD.routes.filter(f=>f[k]===c).sort((a,b)=>b.m-a.m).slice(0,8);
+  return [...top("o"),...top("d")];
+}
+const cname = c=>(CD&&CD.names[c])||(CNAME[c]?CNAME[c]+" County":"County "+c);
+const cfull = c=>cname(c)+", "+(NAMES[c/1000|0]||["?"])[0];
 
 function metric(t,st){return st==="in"?t.in:st==="out"?t.out:st==="pc"?t.pc:st==="gap"?t.gap:t.net}
+// state styles share one scale across every year, so the slider and playback compare like with like
+const SCALES = {};
 function scaleFor(st){
-  const vals=Object.values(T).map(t=>metric(t,st));
+  if(SCALES[st])return SCALES[st];
+  if(st==="ind")return SCALES[st]={kind:"cat"};
+  if(st==="jobs"){
+    const m=d3.quantile(Object.values(JOBS?JOBS.c:{}).map(v=>Math.abs(v[1])).sort(d3.ascending),.95)||5;
+    return SCALES[st]={f:d3.scaleDiverging([-m,0,m],d3.interpolateRgbBasis(["#1c5a85","#3f8fc4","#2a2420","#e2833a","#ffd27a"])).clamp(true),dom:[-m,m],fmt:pct,kind:"div"};
+  }
+  const vals=YEARS.flatMap(y=>Object.values(ALLT[y]).map(t=>metric(t,st)));
   if(st==="in"||st==="out"){
     const max=d3.max(vals);
-    return {f:d3.scaleSequentialSqrt([0,max],d3.interpolateRgbBasis(["#2a2420","#5b2a1e","#a8401f","#e2833a","#ffd27a"])),dom:[0,max],fmt:money,kind:"seq"};
+    return SCALES[st]={f:d3.scaleSequentialSqrt([0,max],d3.interpolateRgbBasis(["#2a2420","#5b2a1e","#a8401f","#e2833a","#ffd27a"])),dom:[0,max],fmt:money,kind:"seq"};
   }
   const m=d3.quantile(vals.map(Math.abs).sort(d3.ascending),.95);
   const f=d3.scaleDiverging([-m,0,m],t=>d3.interpolateRgbBasis(["#1c5a85","#3f8fc4","#2a2420","#e2833a","#ffd27a"])(t)).clamp(true);
-  return {f,dom:[-m,m],fmt:st==="pc"?perHH:st==="gap"?gapFmt:signed,kind:"div"};
+  return SCALES[st]={f,dom:[-m,m],fmt:st==="pc"?perHH:st==="gap"?gapFmt:signed,kind:"div"};
 }
 function val(f){return metric(T[f],style)}
+function ccolor(c){
+  if(style==="ind"){const r=IND&&IND.c[c];return r?IND_COLORS[r[1]]||IND_OTHER:css("--land")}
+  const j=JOBS&&JOBS.c[c];return j?scaleFor("jobs").f(j[1]):css("--land");
+}
 
 function paint(){
-  const sc=scaleFor(style);
-  sel.attr("fill",f=>heat?sc.f(val(+f.id)):css("--land")).classed("sel",f=>+f.id===picked);
-  // legend
+  const sc=scaleFor(style),cm=COUNTY_STYLES.has(style);
+  svg.classed("cmode",cm);
+  sel.attr("fill",f=>heat&&!cm?sc.f(val(+f.id)):css("--land")).classed("sel",f=>+f.id===picked);
+  csel.attr("fill",f=>heat&&cm?ccolor(+f.id):"none").classed("live",f=>(+f.id/1000|0)===picked).classed("on",f=>+f.id===cty);
+  const keys=picked?`<span><i style="background:var(--out)"></i>Money leaving ${cty?cname(cty):NAMES[picked][0]}</span><span><i style="background:var(--in)"></i>Money arriving</span>`
+    :`<span><i style="background:var(--hot)"></i>Flow of income, arrow moves with the money</span>`;
+  if(sc.kind==="cat"){
+    const n=d3.rollup(Object.entries(IND.c).filter(([c])=>CNAME[c]).map(([,r])=>r),v=>v.length,r=>IND_COLORS[r[1]]?r[1]:0);
+    $("#legend").innerHTML=`<div class="lbl">#1 industry by private-sector jobs, ${IND.year}</div>
+      <div class="cats">${[62,31,44].map(s=>`<span><i style="background:${IND_COLORS[s]}"></i>${IND.sectors[s]} <em>${(n.get(s)||0).toLocaleString()}</em></span>`).join("")}
+      <span><i style="background:${IND_OTHER}"></i>Other industries <em>${(n.get(0)||0).toLocaleString()}</em></span></div>
+      <div class="keys">${keys}</div>`;
+    return;
+  }
   const stops=d3.range(0,1.0001,.1).map(t=>sc.f(sc.dom[0]+t*(sc.dom[1]-sc.dom[0])));
-  const title={net:"Net income gained or lost from movers",in:"Income arriving with new residents",out:"Income leaving with departing residents",pc:"Net gain per household that stayed",gap:"Newcomers' income minus leavers', per person"}[style];
+  const title={net:"Net income gained or lost from movers",in:"Income arriving with new residents",out:"Income leaving with departing residents",pc:"Net gain per household that stayed",gap:"Newcomers' income minus leavers', per person",jobs:`Change in jobs from a year earlier, ${JOBS?JOBS.period:""}`}[style];
   const mid=sc.kind==="div"?"0":sc.fmt(sc.dom[1]/2);
   $("#legend").innerHTML=`<div class="lbl">${title}</div>
     <div class="ramp" style="background:linear-gradient(90deg,${stops.join(",")})"></div>
     <div class="ticks"><span>${sc.fmt(sc.dom[0])}</span><span>${mid}</span><span>${sc.fmt(sc.dom[1])}${sc.kind==="div"?"+":""}</span></div>
-    <div class="keys">${picked?`<span><i style="background:var(--out)"></i>Money leaving ${NAMES[picked][0]}</span><span><i style="background:var(--in)"></i>Money arriving</span>`:`<span><i style="background:var(--hot)"></i>Flow of income, arrow moves with the money</span>`}</div>`;
+    <div class="keys">${keys}</div>`;
 }
 
-function arcD(o,d){
-  const [x1,y1]=C[o],[x2,y2]=C[d];const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1;
+function arcD(a,b){
+  const [x1,y1]=a,[x2,y2]=b;const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1;
   const k=Math.min(.32,40/len+.12); // bend to the right of travel, so A→B and B→A separate
   const cx=(x1+x2)/2+dy*k, cy=(y1+y2)/2-dx*k;
   return `M${x1},${y1}Q${cx},${cy} ${x2},${y2}`;
 }
 
 function drawFlows(){
-  let list;
-  if(picked){list=FLOWS.filter(f=>f.o===picked||f.d===picked);}
-  else{list=[...FLOWS].sort((a,b)=>b.m-a.m).slice(0,topN);}
-  const maxM=d3.max(picked?list:FLOWS,f=>f.m);
-  const w=d3.scaleSqrt([0,maxM],[0.6,picked?7:6]);
-  const color=f=>picked?(f.o===picked?css("--out"):css("--in")):css("--hot");
+  let list, pos, me;
+  if(cty){
+    me=cty; pos=CC;
+    list=countyRoutes(cty).filter(f=>CC[f.o]&&CC[f.d]);
+  } else {
+    me=picked; pos=C;
+    list=picked?FLOWS.filter(f=>f.o===picked||f.d===picked):[...FLOWS].sort((a,b)=>b.m-a.m).slice(0,topN);
+  }
+  const maxM=d3.max(me?list:FLOWS,f=>f.m)||1;
+  const w=d3.scaleSqrt([0,maxM],[0.6,me?7:6]);
+  const color=f=>me?(f.o===me?css("--out"):css("--in")):css("--hot");
   const data=showFlows?list:[];
   gArcs.selectAll("g.f").data(data,f=>f.o+"-"+f.d).join(
     enter=>{const g=enter.append("g").attr("class","f");
       g.append("path").attr("class","arc glow");g.append("path").attr("class","arc run");return g;})
     .each(function(f){
-      const d=arcD(f.o,f.d),c=color(f),sw=w(f.m);
+      const d=arcD(pos[f.o],pos[f.d]),c=color(f),sw=w(f.m);
       const g=d3.select(this);
       g.select(".glow").attr("d",d).attr("stroke",c).attr("stroke-width",sw*2.2);
       g.select(".run").attr("d",d).attr("stroke",c).attr("stroke-width",sw).style("animation-duration",(2.6-Math.min(1.6,f.m/maxM*1.6))+"s");
     });
   const ends=new Set();data.forEach(f=>{ends.add(f.o);ends.add(f.d)});
+  if(cty&&CC[cty])ends.add(cty);
   gDots.selectAll("circle").data([...ends],d=>d).join("circle").attr("class","dot")
-    .attr("cx",d=>C[d][0]).attr("cy",d=>C[d][1]).attr("r",d=>d===picked?4.5:2.4);
+    .attr("cx",d=>pos[d][0]).attr("cy",d=>pos[d][1]).attr("r",function(d){this.r0=d===me?4.5:2.4;return this.r0/zk});
+}
+
+// latest BLS jobs and wages for a county or state, as a short paragraph
+function jobsLine(j,where){
+  if(!j)return "";
+  return `<div class="fact"><h3>Jobs now <small>BLS, ${JOBS.period}</small></h3>
+    <p><b>${ppl(j[0])}</b> jobs ${where}, <span class="${j[1]>=0?"pos":"neg"}">${pct(j[1])}</span> from a year earlier. Average weekly wage <b>$${j[2].toLocaleString()}</b> (<span class="${j[3]>=0?"pos":"neg"}">${pct(j[3])}</span>).</p></div>`;
+}
+function industryBlock(c){
+  const r=IND&&IND.c[c];
+  if(!r)return "";
+  const tops=[[r[1],r[2]],[r[3],r[4]],[r[5],r[6]]].filter(x=>x[0]);
+  return `<div class="fact"><h3>#1 industry <small>Census, ${IND.year}</small></h3>
+    <p><b>${IND.sectors[r[1]]}</b>, ${Math.round(r[2]/r[0]*100)}% of ${ppl(r[0])} private-sector jobs.</p>
+    <ul class="bars">${tops.map(([s,e])=>`<li><span>${IND.sectors[s]}</span><i style="width:${Math.max(2,e/r[0]*100)}%;background:${IND_COLORS[s]||IND_OTHER}"></i><em>${Math.round(e/r[0]*100)}%</em></li>`).join("")}</ul></div>`;
 }
 
 function card(){
   const c=$("#card");
-  if(!picked){
+  if(cty) countyCard(c);
+  else if(!picked){
     const sorted=Object.entries(T).sort((a,b)=>b[1].net-a[1].net);
     const top=sorted.slice(0,5),bot=sorted.slice(-5).reverse();
     const row=([f,t])=>`<li class="row"><button data-f="${f}">${NAMES[f][1]}</button><span class="m ${t.net>0?"pos":"neg"}">${signed(t.net)}</span><span class="p">${t.net>0?"+":"−"}${ppl(Math.abs(t.pin-t.pout))} ppl</span></li>`;
     const moved=d3.sum(Object.values(T),t=>t.in);
-    c.innerHTML=`<h2>United States</h2><div class="sub">Income that changed states, 2022→2023 filings</div>
+    c.innerHTML=`<h2>United States</h2><div class="sub">Income that changed states, ${yLong(year)} filings</div>
       <div class="stats"><div class="stat"><div class="v">${money(moved)}</div><div class="k">Moved</div></div>
       <div class="stat"><div class="v">${ppl(d3.sum(Object.values(T),t=>t.pin))}</div><div class="k">People</div></div>
       <div class="stat"><div class="v">$${Math.round(moved*1e6/d3.sum(Object.values(T),t=>t.pin)).toLocaleString()}</div><div class="k">Per person</div></div></div>
+      ${JOBS?jobsLine(JOBS.us,"nationwide"):""}
       <div class="list"><h3><i style="background:var(--hot)"></i>Biggest gainers</h3>${top.map(row).join("")}</div>
       <div class="list"><h3><i style="background:var(--cold)"></i>Biggest losers</h3>${bot.map(row).join("")}</div>
-      <div class="hint">Click any state on the map for its routes, or open the Table to rank every state.</div>`;
+      <div class="hint">Click any state on the map for its routes, then a county for its own. The Table ranks every state.</div>`;
   } else {
     const t=T[picked];
     const outs=FLOWS.filter(f=>f.o===picked).sort((a,b)=>b.m-a.m).slice(0,6);
     const ins=FLOWS.filter(f=>f.d===picked).sort((a,b)=>b.m-a.m).slice(0,6);
     const row=(f,k)=>`<li class="row"><button data-f="${f[k]}">${NAMES[f[k]][1]}</button><span class="m">${money(f.m)}</span><span class="p">${ppl(f.p)} ppl</span></li>`;
-    c.innerHTML=`<h2>${NAMES[picked][1]}</h2><div class="sub">Income carried by people moving in and out, 2022→2023</div>
+    c.innerHTML=`<div class="crumbs"><button data-go="us">United States</button></div>
+      <h2>${NAMES[picked][1]}</h2><div class="sub">Income carried by people moving in and out, ${yLong(year)}</div>
       <div class="stats"><div class="stat"><div class="v">${money(t.in)}</div><div class="k">In</div></div>
       <div class="stat"><div class="v">${money(t.out)}</div><div class="k">Out</div></div>
       <div class="stat"><div class="v ${t.net>=0?"pos":"neg"}">${signed(t.net)}</div><div class="k">Net</div></div></div>
@@ -377,35 +529,90 @@ function card(){
       <div class="stat"><div class="v">${usd(t.aout)}</div><div class="k">Each leaver</div></div>
       <div class="stat"><div class="v ${t.gap>=0?"pos":"neg"}">${gapFmt(t.gap)}</div><div class="k">Difference</div></div></div>
       <div class="sub">Average income per person, children included. Newcomers are ${t.gap>=0?"richer":"poorer"} than the people leaving.</div>
+      ${JOBS?jobsLine(JOBS.s[picked],"in "+NAMES[picked][1]):""}
       <div class="list"><h3><i style="background:var(--out)"></i>Where its money went</h3>${outs.map(f=>row(f,"d")).join("")}</div>
       <div class="list"><h3><i style="background:var(--in)"></i>Where newcomers' money came from</h3>${ins.map(f=>row(f,"o")).join("")}</div>
-      <div class="hint">Click the empty map area to go back to the whole country.</div>`;
+      <div class="hint">${CYEARS.includes(year)?`Click a county in ${NAMES[picked][1]} for its own flows${JOBS?", #1 industry and latest jobs":" and #1 industry"}.`:`County detail covers ${yShort(CYEARS[0])} to ${yShort(CYEARS[CYEARS.length-1])}; move the year slider there to click into counties.`}</div>`;
   }
   c.hidden=false;
   c.querySelectorAll("button[data-f]").forEach(b=>b.onclick=e=>{e.stopPropagation();choose(+b.dataset.f)});
+  c.querySelectorAll("button[data-c]").forEach(b=>b.onclick=e=>{e.stopPropagation();chooseCounty(+b.dataset.c)});
+  c.querySelectorAll("button[data-go]").forEach(b=>b.onclick=e=>{e.stopPropagation();choose(b.dataset.go==="us"?null:picked)});
+}
+
+function countyCard(c){
+  const st=NAMES[picked][1], crumbs=`<div class="crumbs"><button data-go="us">United States</button> › <button data-go="state">${st}</button></div>`;
+  const r=CD&&CD.rec[cty];
+  if(!r){
+    const why=!CYEARS.includes(year)?`County detail covers ${yShort(CYEARS[0])} to ${yShort(CYEARS[CYEARS.length-1])}. Move the year slider there to see it.`
+      :picked===9?"Since 2022 Connecticut reports by planning region, and those don't line up with the county shapes on this map. Pick a region:"
+      :!CD?"Loading…":"The IRS has no figures for this county this year.";
+    const regions=picked===9&&CD?Object.keys(CD.rec).map(Number).sort().map(k=>`<li class="row"><button data-c="${k}">${cname(k)}</button><span class="m ${CD.rec[k].net>=0?"pos":"neg"}">${signed(CD.rec[k].net)}</span><span class="p"></span></li>`).join(""):"";
+    c.innerHTML=`${crumbs}<h2>${cname(cty)}</h2><div class="sub">${why}</div>${regions?`<div class="list">${regions}</div>`:""}${industryBlock(cty)}${jobsLine(JOBS&&JOBS.c[cty],"in the county")}`;
+    return;
+  }
+  const mine=countyRoutes(cty),outs=mine.filter(f=>f.o===cty),ins=mine.filter(f=>f.d===cty);
+  const row=(f,k)=>`<li class="row"><button data-c="${f[k]}">${cfull(f[k])}</button><span class="m">${money(f.m)}</span><span class="p">${ppl(f.p)} ppl</span></li>`;
+  c.innerHTML=`${crumbs}<h2>${cname(cty)}</h2><div class="sub">Income carried by people moving in and out, ${yLong(year)}. Includes moves within ${st}.</div>
+    <div class="stats"><div class="stat"><div class="v">${money(r.in)}</div><div class="k">In</div></div>
+    <div class="stat"><div class="v">${money(r.out)}</div><div class="k">Out</div></div>
+    <div class="stat"><div class="v ${r.net>=0?"pos":"neg"}">${signed(r.net)}</div><div class="k">Net</div></div></div>
+    <div class="sub">${ppl(r.pin)} people moved in, ${ppl(r.pout)} moved out. Net ${perHH(r.pc)} for every household that stayed. Newcomers average ${usd(r.ain)} per person, leavers ${usd(r.aout)}.</div>
+    ${industryBlock(cty)}
+    ${jobsLine(JOBS&&JOBS.c[cty],"in the county")}
+    <div class="list"><h3><i style="background:var(--out)"></i>Where its money went</h3>${outs.map(f=>row(f,"d")).join("")||'<li class="row"><span>No single route big enough to report</span></li>'}</div>
+    <div class="list"><h3><i style="background:var(--in)"></i>Where newcomers' money came from</h3>${ins.map(f=>row(f,"o")).join("")||'<li class="row"><span>No single route big enough to report</span></li>'}</div>
+    <div class="hint">The IRS only lists routes with 20 or more households, so small counties show few.</div>`;
 }
 
 function render(){paint();drawFlows();card();if(!$("#sheet").hidden)table();writeHash()}
 
 function choose(f){
-  picked=f||null; $("#pick").value=picked||"";
+  picked=f||null; cty=null; $("#pick").value=picked||"";
+  unzoom();
   render();
+  syncCounties().then(()=>{if(!$("#sheet").hidden)table()});
   if(window.innerWidth<=760 && picked) togglePanel(false);
 }
+function chooseCounty(c){
+  const s=c/1000|0;
+  if(s!==picked){picked=s;$("#pick").value=s}
+  cty=c; render();
+  syncCounties().then(()=>{
+    if(cty!==c)return;
+    render();
+    const pts=[CC[c],...countyRoutes(c).flatMap(f=>[CC[f.o],CC[f.d]])].filter(Boolean);
+    if(pts.length)fitPoints(pts);
+  });
+  if(window.innerWidth<=760) togglePanel(false);
+}
 
-function showTip(e,f){
-  const t=T[f],tip=$("#tip"),r=$(".stage").getBoundingClientRect();
-  tip.innerHTML=`<b>${NAMES[f][1]}</b> · <span class="${t.net>=0?"pos":"neg"}">${signed(t.net)}</span> net<br><span style="color:var(--muted)">${money(t.in)} in · ${money(t.out)} out</span>`
-    +(style==="gap"?`<br><span style="color:var(--muted)">${usd(t.ain)} per newcomer · ${usd(t.aout)} per leaver</span>`:"");
-  tip.hidden=false;
+function placeTip(e,html){
+  const tip=$("#tip"),r=$(".stage").getBoundingClientRect();
+  tip.innerHTML=html;tip.hidden=false;
   const x=Math.min(e.clientX-r.left+14,r.width-tip.offsetWidth-8),y=Math.max(8,e.clientY-r.top-tip.offsetHeight-10);
   tip.style.left=x+"px";tip.style.top=y+"px";
+}
+function showTip(e,f){
+  const t=T[f];
+  placeTip(e,`<b>${NAMES[f][1]}</b> · <span class="${t.net>=0?"pos":"neg"}">${signed(t.net)}</span> net<br><span style="color:var(--muted)">${money(t.in)} in · ${money(t.out)} out</span>`
+    +(style==="gap"?`<br><span style="color:var(--muted)">${usd(t.ain)} per newcomer · ${usd(t.aout)} per leaver</span>`:""));
+}
+function countyTip(e,c){
+  const r=CD&&(c/1000|0)===picked&&CD.rec[c], i=IND&&IND.c[c], j=JOBS&&JOBS.c[c];
+  placeTip(e,`<b>${cfull(c)}</b>`
+    +(r?`<br><span class="${r.net>=0?"pos":"neg"}">${signed(r.net)}</span> net · <span style="color:var(--muted)">${money(r.in)} in · ${money(r.out)} out</span>`:"")
+    +(i?`<br><span style="color:var(--muted)">#1 industry: ${IND.sectors[i[1]]} (${Math.round(i[2]/i[0]*100)}%)</span>`:"")
+    +(j?`<br><span style="color:var(--muted)">Jobs ${pct(j[1])} from a year earlier</span>`:"")
+    +((c/1000|0)===9&&!i?`<br><span style="color:var(--muted)">Connecticut reports by planning region</span>`:""));
 }
 
 // the view lives in the URL hash, so a copied link reopens exactly this view
 function writeHash(){
   const q=new URLSearchParams();
-  if(picked)q.set("state",NAMES[picked][0]);
+  if(cty)q.set("county",String(cty).padStart(5,"0"));
+  else if(picked)q.set("state",NAMES[picked][0]);
+  if(year!==YEARS[YEARS.length-1])q.set("year",year);
   if(style!=="net")q.set("color",style);
   if(!heat)q.set("heat","off");
   if(!showFlows)q.set("flows","off");
@@ -416,8 +623,12 @@ function writeHash(){
 }
 function readHash(){
   const q=new URLSearchParams(location.hash.slice(1));
-  picked=CODE[(q.get("state")||"").toUpperCase()]||null;
+  const c=+q.get("county");
+  cty=c&&NAMES[c/1000|0]?c:null;
+  picked=cty?cty/1000|0:CODE[(q.get("state")||"").toUpperCase()]||null;
+  setYear(YEARS.includes(q.get("year"))?q.get("year"):YEARS[YEARS.length-1]);
   style=STYLES.includes(q.get("color"))?q.get("color"):"net";
+  if(style==="ind"&&!IND||style==="jobs"&&!JOBS)style="net";
   heat=q.get("heat")!=="off"; showFlows=q.get("flows")!=="off"; showCty=q.get("counties")!=="off";
   topN=Math.min(120,Math.max(10,Math.round((+q.get("top")||40)/5)*5));
   syncControls();
@@ -429,8 +640,22 @@ function syncControls(){
   $("#tg-flow").textContent="〰 Flows: "+(showFlows?"on":"off");$("#tg-flow").setAttribute("aria-pressed",String(showFlows));
   $("#tg-cty").textContent="▦ Counties: "+(showCty?"on":"off");$("#tg-cty").setAttribute("aria-pressed",String(showCty));gCty.attr("display",showCty?null:"none");
   $("#topn").value=topN;$("#topnv").textContent=topN;
+  $("#year").value=YEARS.indexOf(year);$("#yearv").textContent=yShort(year);
+  $("#sub").textContent=`Where America's money moved · IRS ${yShort(year)}`;
 }
-window.addEventListener("hashchange",()=>{if(sel){readHash();render()}});
+window.addEventListener("hashchange",()=>{if(sel){readHash();unzoom();render();syncCounties().then(()=>{if(cty)chooseCounty(cty)})}});
+
+// year slider and playback
+let playT=null;
+function goYear(y){setYear(y);syncControls();render();syncCounties().then(()=>{render()})}
+function stopPlay(){clearInterval(playT);playT=null;$("#play").textContent="▶";$("#play").setAttribute("aria-label","Play through the years")}
+$("#year").oninput=e=>{stopPlay();goYear(YEARS[+e.target.value])};
+$("#play").onclick=()=>{
+  if(playT)return stopPlay();
+  if(year===YEARS[YEARS.length-1])goYear(YEARS[0]);
+  $("#play").textContent="❚❚";$("#play").setAttribute("aria-label","Pause");
+  playT=setInterval(()=>{const i=YEARS.indexOf(year)+1;if(i>=YEARS.length)return stopPlay();goYear(YEARS[i])},1400);
+};
 
 let toastT;
 function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2400)}
@@ -440,7 +665,7 @@ $("#share").onclick=async()=>{
   catch(e){toast("Copy the address bar to share this view")}
 };
 
-// sortable table of every state, or of every route the map keeps
+// sortable table of every state, every route the map keeps, or the selected state's counties
 const COLS = {
   states:[
     {k:"name",h:"State",v:r=>NAMES[r.f][1],f:r=>r.f},
@@ -452,43 +677,67 @@ const COLS = {
     {k:"pout",h:"People out",v:r=>r.pout,fmt:n=>n.toLocaleString()},
     {k:"ain",h:"Each newcomer",v:r=>r.ain,fmt:usd},
     {k:"aout",h:"Each leaver",v:r=>r.aout,fmt:usd},
-    {k:"gap",h:"Difference",v:r=>r.gap,fmt:gapFmt,tone:1}],
+    {k:"gap",h:"Difference",v:r=>r.gap,fmt:gapFmt,tone:1},
+    {k:"jobs",h:"Job change",v:r=>r.jobs,fmt:v=>v==null?"–":pct(v),tone:1}],
   routes:[
     {k:"from",h:"From",v:r=>NAMES[r.o][1],f:r=>r.o},
     {k:"to",h:"To",v:r=>NAMES[r.d][1],f:r=>r.d},
     {k:"m",h:"Income",v:r=>r.m,fmt:money},
     {k:"p",h:"People",v:r=>r.p,fmt:n=>n.toLocaleString()},
-    {k:"a",h:"Per person",v:r=>r.a,fmt:usd}]
+    {k:"a",h:"Per person",v:r=>r.a,fmt:usd}],
+  counties:[
+    {k:"name",h:"County",v:r=>cname(r.c),cf:r=>r.c},
+    {k:"net",h:"Net",v:r=>r.net,fmt:signed,tone:1},
+    {k:"in",h:"In",v:r=>r.in,fmt:money},
+    {k:"out",h:"Out",v:r=>r.out,fmt:money},
+    {k:"pc",h:"Per household",v:r=>r.pc,fmt:perHH,tone:1},
+    {k:"pin",h:"People in",v:r=>r.pin,fmt:n=>n.toLocaleString()},
+    {k:"pout",h:"People out",v:r=>r.pout,fmt:n=>n.toLocaleString()},
+    {k:"ind",h:"#1 industry",v:r=>r.ind,txt:1},
+    {k:"jobs",h:"Job change",v:r=>r.jobs,fmt:v=>v==null?"–":pct(v),tone:1}]
 };
 let tab="states";
-const sortBy={states:["net",-1],routes:["m",-1]};
+const sortBy={states:["net",-1],routes:["m",-1],counties:["net",-1]};
 
 function table(){
+  $("#tab-counties").hidden=!(picked&&CD);
+  if(tab==="counties"&&!(picked&&CD))tab="states";
+  ["states","routes","counties"].forEach(t=>$("#tab-"+t).setAttribute("aria-selected",String(t===tab)));
+  $("#tab-counties").textContent=picked&&CD?NAMES[picked][0]+" counties":"Counties";
   const cols=COLS[tab],[k,dir]=sortBy[tab],col=cols.find(c=>c.k===k);
   const q=$("#tfilter").value.trim().toLowerCase();
+  $("#tfilter").placeholder=tab==="counties"?"Filter by county":"Filter by state";
   const hit=f=>!q||NAMES[f][1].toLowerCase().includes(q)||NAMES[f][0].toLowerCase()===q;
   const rows=tab==="states"
-    ?Object.entries(T).map(([f,t])=>({f:+f,...t})).filter(r=>hit(r.f))
-    :FLOWS.map(r=>({...r,a:r.m*1e6/r.p})).filter(r=>hit(r.o)||hit(r.d));
-  rows.sort((a,b)=>{const x=col.v(a),y=col.v(b);return (typeof x==="string"?x.localeCompare(y):x-y)*dir});
-  const on=r=>tab==="states"?r.f===picked:r.o===picked||r.d===picked;
+    ?Object.entries(T).map(([f,t])=>({f:+f,...t,jobs:JOBS&&JOBS.s[f]?JOBS.s[f][1]:null})).filter(r=>hit(r.f))
+    :tab==="routes"?FLOWS.map(r=>({...r,a:r.m*1e6/r.p})).filter(r=>hit(r.o)||hit(r.d))
+    :Object.values(CD.rec).map(r=>({...r,ind:IND&&IND.c[r.c]?IND.sectors[IND.c[r.c][1]]:"",jobs:JOBS&&JOBS.c[r.c]?JOBS.c[r.c][1]:null})).filter(r=>!q||cname(r.c).toLowerCase().includes(q));
+  const key=r=>{const x=col.v(r);return x==null?(dir>0?Infinity:-Infinity):x};
+  rows.sort((a,b)=>{const x=key(a),y=key(b);return (typeof x==="string"?x.localeCompare(y):x-y)*dir});
+  const on=r=>tab==="states"?r.f===picked:tab==="routes"?r.o===picked||r.d===picked:r.c===cty;
   const cell=(c,r)=>c.f?`<td class="t"><button data-f="${c.f(r)}">${c.v(r)}</button></td>`
-    :`<td class="${c.tone?(c.v(r)>=0?"pos":"neg"):""}">${c.fmt(c.v(r))}</td>`;
-  $("#tbl").innerHTML=`<thead><tr>${cols.map(c=>`<th${c.f?' class="t"':""}${c.k===k?` aria-sort="${dir>0?"ascending":"descending"}"`:""}><button data-k="${c.k}">${c.h}</button></th>`).join("")}</tr></thead>
-    <tbody>${rows.map(r=>`<tr${picked&&on(r)?' class="on"':""}>${cols.map(c=>cell(c,r)).join("")}</tr>`).join("")}</tbody>`;
+    :c.cf?`<td class="t"><button data-c="${c.cf(r)}">${c.v(r)}</button></td>`
+    :c.txt?`<td class="t s">${c.v(r)}</td>`
+    :`<td class="${c.tone&&c.v(r)!=null?(c.v(r)>=0?"pos":"neg"):""}">${c.fmt(c.v(r))}</td>`;
+  $("#tbl").innerHTML=`<thead><tr>${cols.map(c=>`<th${c.f||c.cf||c.txt?' class="t"':""}${c.k===k?` aria-sort="${dir>0?"ascending":"descending"}"`:""}><button data-k="${c.k}">${c.h}</button></th>`).join("")}</tr></thead>
+    <tbody>${rows.map(r=>`<tr${(picked||cty)&&on(r)?' class="on"':""}>${cols.map(c=>cell(c,r)).join("")}</tr>`).join("")}</tbody>`;
   $("#tnote").textContent=tab==="states"
-    ?`${rows.length} of 51 (50 states and DC). Each newcomer and each leaver are average income per person, children included. Click a name to see it on the map.`
-    :`${rows.length} routes. The map keeps each state's six biggest routes in and out, so smaller routes aren't listed.`;
+    ?`${rows.length} of 51 (50 states and DC), ${yLong(year)}. Each newcomer and each leaver are average income per person, children included.${JOBS?` Job change: BLS, ${JOBS.period} vs a year earlier.`:""}`
+    :tab==="routes"?`${rows.length} routes, ${yLong(year)}. The map keeps each state's six biggest routes in and out, so smaller routes aren't listed.`
+    :`${rows.length} counties in ${NAMES[picked][1]}, ${yLong(year)}. In and out include moves within the state. #1 industry: Census ${IND?IND.year:""}.`;
 }
 $("#tbl").onclick=e=>{
   const h=e.target.closest("th button");
-  if(h){const k=h.dataset.k,[k0,d0]=sortBy[tab];sortBy[tab]=[k,k===k0?-d0:(COLS[tab].find(c=>c.k===k).f?1:-1)];table();return}
+  if(h){const k=h.dataset.k,[k0,d0]=sortBy[tab],c=COLS[tab].find(c=>c.k===k);sortBy[tab]=[k,k===k0?-d0:(c.f||c.cf||c.txt?1:-1)];table();return}
   const b=e.target.closest("button[data-f]");
-  if(b){toggleTable(false);choose(+b.dataset.f)}
+  if(b){toggleTable(false);choose(+b.dataset.f);return}
+  const cb=e.target.closest("button[data-c]");
+  if(cb){toggleTable(false);chooseCounty(+cb.dataset.c)}
 };
-function setTab(t){tab=t;$("#tab-states").setAttribute("aria-selected",String(t==="states"));$("#tab-routes").setAttribute("aria-selected",String(t==="routes"));table()}
+function setTab(t){tab=t;table()}
 $("#tab-states").onclick=()=>setTab("states");
 $("#tab-routes").onclick=()=>setTab("routes");
+$("#tab-counties").onclick=()=>setTab("counties");
 $("#tfilter").oninput=table;
 function toggleTable(open){$("#sheet").hidden=!open;$("#table").setAttribute("aria-expanded",String(open));if(open)table()}
 $("#table").onclick=()=>toggleTable($("#sheet").hidden);
@@ -512,8 +761,17 @@ $("#tools").onclick=()=>togglePanel($("#panel").hidden);
 $("#closeP").onclick=()=>togglePanel(false);
 if(window.innerWidth<=760){togglePanel(false)}
 
-Promise.all([d3.json("data/us-topo.json"),d3.json("data/states-2223.json")]).then(([topo,mig])=>{
-  setData(mig);build(topo);readHash();render();
+const optional = p=>d3.json(p).catch(()=>null);
+d3.json("data/years.json").then(yrs=>Promise.all([yrs,d3.json("data/us-topo.json"),yrs.industry?optional("data/industry.json"):null,yrs.jobs?optional("data/jobs.json"):null])).then(([yrs,topo,ind,jobs])=>{
+  YEARS=yrs.states;CYEARS=yrs.counties||[];IND=ind;JOBS=jobs;
+  if(!IND)$("#st-ind").closest("label").hidden=true;
+  if(!JOBS)$("#st-jobs").closest("label").hidden=true;
+  $("#year").max=YEARS.length-1;
+  return Promise.all(YEARS.map(y=>d3.json(`data/states-${y}.json`))).then(all=>{
+    all.forEach((mig,i)=>[ALLT[YEARS[i]],ALLF[YEARS[i]]]=parseYear(mig));
+    build(topo);readHash();render();
+    syncCounties().then(()=>{if(cty)chooseCounty(cty);else if(!$("#sheet").hidden)table()});
+  });
 }).catch(err=>{
   console.error(err);
   const c=$("#card");c.hidden=false;
