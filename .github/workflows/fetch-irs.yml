@@ -1,5 +1,6 @@
-# Downloads the raw IRS SOI migration CSVs and Census County Business Patterns
-# (industry sectors only) and stores them, gzipped, on the irs-raw branch,
+# Downloads the raw IRS SOI migration CSVs, Census County Business Patterns
+# (industry sectors only) and the latest BLS QCEW quarter (all-industry totals)
+# and stores them, gzipped, on the irs-raw branch,
 # where scripts/build_data.py picks them up.
 name: Fetch source data
 on:
@@ -33,6 +34,17 @@ jobs:
               rm "$f"; echo "ok cbp${y}co"; break
             fi
             echo "missing cbp${y}co"
+          done
+      - name: Download the latest BLS QCEW quarter (total, all industries)
+        run: |
+          cd raw
+          y=$(date -u +%Y)
+          for yq in "$y 4" "$y 3" "$y 2" "$y 1" "$((y-1)) 4" "$((y-1)) 3" "$((y-1)) 2" "$((y-1)) 1"; do
+            set -- $yq
+            if curl -fsSL --retry 3 -A "currency-flow-map/1.0 (https://github.com/${{ github.repository }})" -o qcew.csv "https://data.bls.gov/cew/data/api/$1/$2/industry/10.csv" && [ "$(wc -l < qcew.csv)" -gt 1000 ]; then
+              mv qcew.csv "qcew$1q$2.csv"; echo "ok qcew$1q$2"; break
+            fi
+            rm -f qcew.csv; echo "missing qcew $1 q$2"
           done
       - name: List and compress
         run: |
