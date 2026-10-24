@@ -1,7 +1,7 @@
 """Build the site's data files from the raw IRS and Census downloads.
 
-The raw files live, gzipped, on the irs-raw branch (the "Fetch source data"
-workflow puts them there). To rebuild:
+scripts/fetch_sources.sh downloads the raw files; the "Update data" workflow
+also keeps them, gzipped, on the irs-raw branch. To rebuild from those:
 
     git fetch origin irs-raw:refs/remotes/origin/irs-raw
     mkdir -p raw && git archive origin/irs-raw | tar -x -C raw

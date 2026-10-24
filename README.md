@@ -47,15 +47,21 @@ planning region since 2022) gets approximate points for its nine regions.
 
 ## Updating the data
 
-The raw files come from the IRS and the Census Bureau. The **Fetch
-source data** GitHub workflow downloads them and stores them, gzipped, on the
-`irs-raw` branch. Then:
+The **Update data** GitHub workflow runs on the 3rd of every month (or by hand
+from the Actions tab). It downloads the IRS and Census files with
+`scripts/fetch_sources.sh`, rebuilds `public/data` with
+`scripts/build_data.py`, and commits only if something changed, so a new IRS
+year or Census release shows up on the site within a month of publication.
+It also keeps the raw files, gzipped, on the `irs-raw` branch. To rebuild
+locally from those:
 
 ```bash
 git fetch origin irs-raw:refs/remotes/origin/irs-raw
 mkdir -p raw && git archive origin/irs-raw | tar -x -C raw
 python3 scripts/build_data.py raw
 ```
+
+Or download fresh with `scripts/fetch_sources.sh raw` first.
 
 ## Running locally
 

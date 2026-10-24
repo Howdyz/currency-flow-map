@@ -1,0 +1,32 @@
+# Once a month, download the IRS and Census source files, rebuild public/data,
+# and commit any change to main (Render redeploys on the commit). The raw
+# files are also kept, gzipped, on the irs-raw branch for local rebuilds.
+name: Update data
+on:
+  schedule:
+    - cron: "17 9 3 * *"   # 09:17 UTC on the 3rd of each month
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download source files
+        run: scripts/fetch_sources.sh raw
+      - name: Build data
+        run: python3 scripts/build_data.py raw
+      - name: Commit new data
+        run: |
+          git add public/data
+          if git diff --cached --quiet; then echo "No new data"; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Update data from the IRS and Census"
+          git push
+      - name: Keep the raw files on irs-raw
+        run: |
+          cd raw
+          git init -q -b irs-raw
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -qm "Raw source files"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" irs-raw
