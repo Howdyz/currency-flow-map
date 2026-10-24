@@ -1,0 +1,13 @@
+# Temporary: checks whether the official BLS API answers from GitHub's runners.
+name: BLS API probe
+on:
+  push:
+    branches: [bls]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask the BLS API for one QCEW series (Harris County, TX jobs)
+        run: |
+          curl -sS -A "currency-flow-map data update (jcashen505@gmail.com)" -w "\nHTTP %{http_code}\n" \
+            https://api.bls.gov/publicAPI/v1/timeseries/data/ENU4820110010 | head -c 1500
