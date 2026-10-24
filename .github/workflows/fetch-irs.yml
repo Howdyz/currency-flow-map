@@ -1,0 +1,33 @@
+# Downloads the raw IRS SOI migration CSVs and stores them, gzipped, on the
+# irs-raw branch, where scripts/build_data.py picks them up.
+name: Fetch IRS migration data
+on:
+  workflow_dispatch:
+  push:
+    branches: [irs-fetch]
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download state and county files
+        run: |
+          mkdir raw && cd raw
+          get() { curl -fsSL --retry 3 -A "Mozilla/5.0 (currency-flow-map data fetch)" -o "$1" "https://www.irs.gov/pub/irs-soi/$1" && echo "ok $1" || { rm -f "$1"; echo "missing $1"; }; }
+          for y in 1112 1213 1314 1415 1516 1617 1718 1819 1920 2021 2122 2223 2324 2425; do
+            get stateinflow$y.csv; get stateoutflow$y.csv
+          done
+          for y in 2021 2122 2223 2324 2425; do
+            get countyinflow$y.csv; get countyoutflow$y.csv
+          done
+          ls -la
+          for f in *.csv; do echo "== $f"; head -3 "$f"; done
+          gzip -9 *.csv
+      - name: Commit to irs-raw
+        run: |
+          cd raw
+          git init -q -b irs-raw
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -qm "Raw IRS SOI migration CSVs"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" irs-raw
