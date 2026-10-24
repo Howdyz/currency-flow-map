@@ -11,6 +11,7 @@ Writes, under public/data/:
     states-YYZZ.json       one per IRS year (e.g. 2223 = 2022 -> 2023 filings)
     counties/YYZZ/SS.json  one per state per year with county files
     industry.json          each county's biggest industries (County Business Patterns)
+    jobs.json              latest quarter's jobs and weekly wages, with yearly change (BLS QCEW)
     years.json             which years exist at each level
 """
 
@@ -202,6 +203,55 @@ def build_industry(raw):
     return {"year": year, "sectors": SECTORS, "c": out}
 
 
+def build_jobs(raw):
+    """Latest BLS QCEW quarter: jobs and average weekly wage, all industries and owners."""
+    paths = sorted(glob.glob(os.path.join(raw, "qcew*.csv.gz")))
+    if not paths:
+        return None
+    m = re.search(r"qcew(\d{4})q(\d)", paths[-1])
+    acc = {}
+    for r in read_csv(paths[-1]):
+        if r["own_code"] != "0" or r["agglvl_code"] not in ("10", "50", "70") or r["disclosure_code"].upper() == "N":   # N = withheld
+            continue
+        area = r["area_fips"]
+        if area == "US000":
+            key = ("us", 0)
+        elif area.endswith("000"):
+            key = ("s", int(area[:2]))
+        elif area[:2].isdigit() and int(area[:2]) <= 56 and not area.endswith("999"):
+            key = ("c", county(area[:2], area[2:]))
+        else:
+            continue
+        months = [num(r[f"month{i}_emplvl"]) for i in (1, 2, 3)]
+        changes = [num(r[f"oty_month{i}_emplvl_chg"]) for i in (1, 2, 3)]
+        acc.setdefault(key, []).append((months, changes, num(r["total_qtrly_wages"]),
+                                        num(r["oty_total_qtrly_wages_chg"]), r))
+
+    def summarize(parts):
+        if len(parts) == 1:
+            months, changes, _, _, r = parts[0]
+            emp, chg = months[2], changes[2]
+            return [emp, round(100 * chg / (emp - chg), 1), num(r["avg_wkly_wage"]),
+                    float(r["oty_avg_wkly_wage_pct_chg"] or 0)]
+        # Alaska's two folded boroughs: recombine from totals the way BLS computes them
+        emp = sum(p[0][2] for p in parts)
+        chg = sum(p[1][2] for p in parts)
+        avg = sum(sum(p[0]) for p in parts) / 3
+        avg_before = avg - sum(sum(p[1]) for p in parts) / 3
+        wages = sum(p[2] for p in parts)
+        wages_before = wages - sum(p[3] for p in parts)
+        wage, wage_before = wages / avg / 13, wages_before / avg_before / 13
+        return [emp, round(100 * chg / (emp - chg), 1), round(wage), round(100 * (wage / wage_before - 1), 1)]
+
+    out = {"period": f"{m.group(1)} Q{m.group(2)}", "us": None, "s": {}, "c": {}}
+    for (level, code), parts in acc.items():
+        if level == "us":
+            out["us"] = summarize(parts)
+        else:
+            out[level][str(code)] = summarize(parts)
+    return out
+
+
 def write(path, data):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
@@ -222,8 +272,13 @@ def main(raw):
     if industry:
         write(os.path.join(OUT, "industry.json"), industry)
         print("industry", industry["year"], len(industry["c"]), "counties")
+    jobs = build_jobs(raw)
+    if jobs:
+        write(os.path.join(OUT, "jobs.json"), jobs)
+        print("jobs", jobs["period"], len(jobs["c"]), "counties")
     write(os.path.join(OUT, "years.json"), {"states": state_years, "counties": county_years,
-                                             "industry": industry and industry["year"], "jobs": None})
+                                             "industry": industry and industry["year"],
+                                             "jobs": jobs and jobs["period"]})
 
 
 if __name__ == "__main__":
