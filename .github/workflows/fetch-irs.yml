@@ -1,6 +1,7 @@
-# Downloads the raw IRS SOI migration CSVs and stores them, gzipped, on the
-# irs-raw branch, where scripts/build_data.py picks them up.
-name: Fetch IRS migration data
+# Downloads the raw IRS SOI migration CSVs and Census County Business Patterns
+# (industry sectors only) and stores them, gzipped, on the irs-raw branch,
+# where scripts/build_data.py picks them up.
+name: Fetch source data
 on:
   workflow_dispatch:
   push:
@@ -21,6 +22,21 @@ jobs:
           for y in 2021 2122 2223 2324 2425; do
             get countyinflow$y.csv; get countyoutflow$y.csv
           done
+      - name: Download County Business Patterns (2-digit industry sectors)
+        run: |
+          cd raw
+          for y in 23 22; do
+            if curl -fsSL --retry 3 -A "Mozilla/5.0 (currency-flow-map data fetch)" -o cbp.zip "https://www2.census.gov/programs-surveys/cbp/datasets/20$y/cbp${y}co.zip"; then
+              unzip -o -q cbp.zip && rm cbp.zip
+              f=$(ls cbp${y}co.txt)
+              { head -1 "$f"; grep -E '^[^,]*,[^,]*,"?([0-9]{2}----|------)"?,' "$f"; } > cbp${y}co.csv
+              rm "$f"; echo "ok cbp${y}co"; break
+            fi
+            echo "missing cbp${y}co"
+          done
+      - name: List and compress
+        run: |
+          cd raw
           ls -la
           for f in *.csv; do echo "== $f"; head -3 "$f"; done
           gzip -9 *.csv
