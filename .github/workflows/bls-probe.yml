@@ -1,4 +1,4 @@
-# Temporary: checks whether the official BLS API answers from GitHub's runners.
+# Temporary: checks whether FRED (St. Louis Fed, which republishes BLS county data) answers from GitHub's runners.
 name: BLS API probe
 on:
   push:
@@ -7,7 +7,7 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Ask the BLS API for one QCEW series (Harris County, TX jobs)
-        run: |
-          curl -sS -A "currency-flow-map data update (jcashen505@gmail.com)" -w "\nHTTP %{http_code}\n" \
-            https://api.bls.gov/publicAPI/v1/timeseries/data/ENU4820110010 | head -c 1500
+      - name: FRED graph CSV (Harris County, TX unemployment rate)
+        run: curl -sS -w "\nHTTP %{http_code}\n" "https://fred.stlouisfed.org/graph/fredgraph.csv?id=TXHARR1URN" | tail -5
+      - name: FRED API without a key (expect a 'missing api_key' error if reachable)
+        run: curl -sS -w "\nHTTP %{http_code}\n" "https://api.stlouisfed.org/fred/series?series_id=TXHARR1URN&file_type=json" | head -c 400
